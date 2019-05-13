@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+	<div id="toolbar"></div>
+	<div id="add_item">
+		<form action="/create" method="POST">
+			<input type="text" name="todo_new"><button>Add</button>
+		</form>
+	</div>
+	<div id="todo_list"><p>TODO LIST</p>
+		<% for( var i = 0; i < task.length; i++){ %>
+	    <div>
+	      <div id="date"><%= date[i] %></div>
+	      <% if(edit_id== i){ %>
+	      <form action="/update/<%= i %>" method="POST">
+          <input type="text" name="todo_update" value="<%= task[i] %>" /><button>OK</button>
+      	  </form>
+	      <div><button><a href="/">Back</a></button></div>
+	      <% else {%>
+	      <li><input type="checkbox" name="check" value="<%= task[i] %>" /><%= task[i] %></li>
+	      <div><button><a href="/edit/<%= i %>">M</a></button><button><a href="/delete/<%= i %>">D</a></button></div>      
+	      <% } %>
+	    </div>
+	    <% } %>
+	</div>
+  </body>
+</html>
