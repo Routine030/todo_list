@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Todos', {
+    return queryInterface.createTable('todolists', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,8 +9,8 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       content: {
-        type: Sequelize.STRING
-      },
+		type: Sequelize.STRING
+	  },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -21,11 +21,18 @@ module.exports = {
       },
 	  deletedAt: {
         type: Sequelize.DATE
-		}
-    },{    freezeTableName: false,
-    paranoid: true});
+	  }
+    },
+	{
+		freezeTableName: false,
+		paranoid: true,
+        charset: "utf8mb4",
+        dialectOptions: {
+        collate: "utf8mb4_unicode_ci"
+        }
+	}); 
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Todos');
+    return queryInterface.dropTable('todolists');
   }
 };
