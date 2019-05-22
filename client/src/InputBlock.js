@@ -1,6 +1,5 @@
 import React from "react"
 import $ from 'jquery';
-import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import { SearchBlock } from "./SearchBlock"
 import { SearchDateBlock } from "./SearchDateBlock"
@@ -26,25 +25,30 @@ class InputBlock extends React.Component{
       /* something should to-do:*/ 
       var self = this;
       if(this.state.createtodo==''){
-          alert('待辦事項名稱未輸入！')
+          alert('Please input data')
       }
       else{
         var text=(this.state);
              $.ajax({
                 method: "POST",
-                url: "http://localhost:3001/index2",
+                url: "http://localhost:3001/",
                 data: text,
                })
                 .done(function( msg ) {
-                  alert('fin');
                   self.props.addTodo(msg[0]);//set state
                   self.setState({createtodo:''});//change display
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                  if(jqXHR.responseText){
+                      alert(textStatus+': '+jqXHR.responseText);
+                  }
+                  else{
+                      alert(textStatus+': '+errorThrown);
+                  }
                 });
-
       }
   }
   searchByText(){
-  	 console.log('searchByText: '+this.state.displaysearchtext)
   	if(this.state.displaysearchtext){
   		this.setState({displaysearchtext:0});
   	}else{
@@ -65,11 +69,9 @@ class InputBlock extends React.Component{
 
 	if(this.state.displaysearchtext){
       distext={display:''}
-       console.log('render:1')
     }
     else{
       distext={display:'none'}
-      console.log('render:2')
     }
     if(this.state.displaysearchdate){
       disdate={display:''}

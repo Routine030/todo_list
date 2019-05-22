@@ -16,35 +16,50 @@ class Message extends React.Component{
     this.submitEditTodo = this.submitEditTodo.bind(this)
     this.editMsg = this.editMsg.bind(this)
     this.clearMod= this.clearMod.bind(this)
-    this.state = ({normalMode:1,oriMsg:this.props.content,})
+    this.state = ({normalMode:1,oriMsg:this.props.content})
   }
   submitDelTodo(){
     /* something should to-do:
       set state and change display
       del backend DB
     */
-    var tempUrl='http://localhost:3001/index2/todo/'+this.props.id;    
+    var tempUrl='http://localhost:3001/todo/'+this.props.id;    
     var delSendMsg;
     if(this.props.deltag)//recovery
     {
      delSendMsg={deltag:0,id:this.props.id}
-     this.props.delTodo(delSendMsg);     
      $.ajax({
         type: "POST",
         url: tempUrl,
        })
       .done(function( msg ) {
-        alert('rev ok!')
+             this.props.delTodo(delSendMsg);  
+       }.bind(this))
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if(jqXHR.responseText){
+            alert(textStatus+': '+jqXHR.responseText);
+        }
+        else{
+            alert(textStatus+': '+errorThrown);
+        }
        });
-    }else{//delete
+    }else //delete
+    {     
      delSendMsg={deltag:1,id:this.props.id};
-     this.props.delTodo(delSendMsg);     
      $.ajax({
         type: "DELETE",
         url: tempUrl,
        })
       .done(function( msg ) {
-        alert('del ok!')
+         this.props.delTodo(delSendMsg);
+       }.bind(this))
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if(jqXHR.responseText){
+            alert(textStatus+': '+jqXHR.responseText);
+        }
+        else{
+            alert(textStatus+': '+errorThrown);
+        }
        });
     }
   }
@@ -56,23 +71,33 @@ class Message extends React.Component{
       set state and change display
       del backend DB
     */
-    var tempUrl='http://localhost:3001/index2/todo/'+this.props.id; 
+    var tempUrl='http://localhost:3001/todo/'+this.props.id; 
     var modSendMsg;
     var text=this.state;
+    console.log('text: '+text);
     if(this.state.oriMsg){
       this.setState({normalMode:1});
      modSendMsg={id:this.props.id, content:this.state.oriMsg};
-     this.props.modTodo(modSendMsg);     
+   
      $.ajax({
         type: "PUT",
         url: tempUrl,
         data: text,
        })
       .done(function( msg ) {
-        alert('mod ok!')
+        console.log(msg);
+        this.props.modTodo(modSendMsg);  
+       }.bind(this))
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if(jqXHR.responseText){
+            alert(textStatus+': '+jqXHR.responseText);
+        }
+        else{
+            alert(textStatus+': '+errorThrown);
+        }
        });
     }
-    else{alert('no data!');}
+    else{alert('Please input data');}
   }
   editMsg(e){
         this.setState({oriMsg:e.target.value});

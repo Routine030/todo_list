@@ -1,17 +1,14 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import $ from 'jquery';
 
 import Grid from '@material-ui/core/Grid';
 import { MessageBlock } from "./MessageBlock"
 import { InputBlock } from "./InputBlock"
 import { MainTitle } from "./MainTitle"
+import { BottomAppBar }  from "./BottomAppBar"
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import theme from "./theme/muiTheme"
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import { BottomAppBar }  from "./BottomAppBar"
+
 class App extends React.Component{
   constructor(props){
     super(props)
