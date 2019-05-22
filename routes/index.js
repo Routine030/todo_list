@@ -48,16 +48,20 @@ function idIsUnique(req,res,next)
 		next(err);
 	});			
 }
+function preCheckContent(req,res,next)
+{
+	if(req.body.createtodo==(null|| undefined || "")){
+		var error = new Error('Input is null');
+		throw error;
+	}
+	if((req.body.createtodo).length>50){
+		var error = new RangeError('Input is too long');
+		throw error;
+	}	
+	next(); 
+}
 router.route('/')
-	.post(function(req,res){//create new todo
-		if(req.body.createtodo==(null|| undefined || "")){
-			var error = new Error('Input is null');
-			throw error;
-		}
-		if((req.body.createtodo).length>50){
-			var error = new RangeError('Input is too long');
-			throw error;
-		}		
+	.post(preCheckContent,function(req,res){//create new todo	
 		db.create({content: req.body.createtodo})
 		.then(function(result){
 				let jsonstr=JSON.stringify(result.dataValues);
