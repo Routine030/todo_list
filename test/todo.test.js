@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const supertest = require('supertest');
 
-const api = supertest('http://localhost:3001');
+const  server = require('../app');
+const api = supertest(server);
 
 describe('TEST for todo', () => {
   //create a new todo test
