@@ -1,9 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var db = require('./post');
-var Sequelize = require('sequelize');
+var db  = require('../models');
 
-const Op = Sequelize.Op;
 function idNotANum(req,res,next)
 {
 	var req_id = req.params.id;
@@ -23,7 +21,7 @@ function idIsUnique(req,res,next)
 	var todo_id = req.params.id;
 
 	let checkIdExist = function(id){ //use promise to get query result
-		return db.findByPk(id,{ paranoid: false}) // paranoid: false=>the data has deletedAt will be search
+		return db.todolists.findByPk(id,{ paranoid: false}) // paranoid: false=>the data has deletedAt will be search
 		.then(function(ret){
 			if(!ret){
 				return 0;
@@ -62,7 +60,7 @@ function preCheckContent(req,res,next)
 }
 router.route('/')
 	.post(preCheckContent,function(req,res){//create new todo	
-		db.create({content: req.body.createtodo})
+		db.todolists.create({content: req.body.createtodo})
 		.then(function(result){
 				let jsonstr=JSON.stringify(result.dataValues);
 				let arr=JSON.parse(jsonstr);
@@ -79,7 +77,7 @@ router.route('/')
 		});		
 	})
 	.get(function (req, res){//display all item
-		db.findAll({ paranoid: false}).then(function(result){
+		db.todolists.findAll({ paranoid: false}).then(function(result){
 			var arr = [];
 	        for (var i = 0, output; output = result[i++];) {
 	        	let del_tag=0;
@@ -102,7 +100,7 @@ router.route('/')
 router.route('/todo/:id')
 	.delete(idNotANum,idIsUnique,function(req,res){
 		var req_id = req.params.id;
-		db.destroy({
+		db.todolists.destroy({
 		  where: {
 		    id: req_id
 		  }
@@ -115,7 +113,7 @@ router.route('/todo/:id')
 	})
 	.post(idNotANum,idIsUnique,function(req,res){
 		var req_id = req.params.id;
-		db.update( { deletedAt: null }, { where: {id: req_id}, paranoid: false })
+		db.todolists.update( { deletedAt: null }, { where: {id: req_id}, paranoid: false })
 		.then(() => {
 		  console.log("recovery");
 		  res.status(200).json('ok');
@@ -126,7 +124,7 @@ router.route('/todo/:id')
 	.put(idNotANum,idIsUnique,function(req,res){
 		var req_id = req.params.id;
 		console.log(req.body.oriMsg);
-		db.update( { content: req.body.oriMsg }, { where: {id: req_id}})
+		db.todolists.update( { content: req.body.oriMsg }, { where: {id: req_id}})
 		.then(() => {
 		  console.log("update");
 		  res.status(200).json('ok');
