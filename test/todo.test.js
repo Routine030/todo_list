@@ -1,12 +1,25 @@
 const { expect } = require('chai');
 const supertest = require('supertest');
-
+const db = require('../models/index');
 const  server = require('../app');
 const api = supertest(server);
-
 describe('TEST for todo', () => {
+
+let test_id;
+
+before('before start', (done)=>{
+
+  let testData={content: 'unit test'}
+  db.todolists.create(testData)
+  .then((result) => {
+          test_id=result.id;
+          done();
+      });
+})
+
   //create a new todo test
   it('1)Test create a new todo(POST)', (done) => {
+
     let postreq={ createtodo: 'find job' }
     api.post('/')
       .send(postreq)
@@ -28,7 +41,9 @@ describe('TEST for todo', () => {
         }
       });
   });  
+    
   it('2)Test create a new todo(POST) with no input data', (done) => {
+
     api.post('/')
       .expect(500)
       .end((err, res) => {
@@ -41,6 +56,7 @@ describe('TEST for todo', () => {
       });
   });
   it('3)Test create a new todo(POST) with null input data', (done) => {
+
     api.post('/')
       .send('')
       .expect(500)
@@ -55,9 +71,9 @@ describe('TEST for todo', () => {
   });
   //modify a todo test    
   it('4)Test update exist todo(PUT)', (done) => {
+
     let putreq={ oriMsg: 'practice SE6' }
-    let serachId=1;
-    api.put('/todo/'+serachId)
+    api.put('/todo/'+test_id)
       .send(putreq)
       .expect(200)
       .end((err, res) => {
@@ -87,8 +103,8 @@ describe('TEST for todo', () => {
   });
   //delete a todo
   it('6)Test delete exist todo(DELETE)', (done) => {
-    let serachId=1;
-    api.del('/todo/'+serachId)
+
+    api.del('/todo/'+test_id)
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -101,6 +117,7 @@ describe('TEST for todo', () => {
       });
   });
   it('7)Test delete todo(DELETE) with illegal index', (done) => {
+
     let serachId='abc';
     api.del('/todo/'+serachId)
       .expect(500)
@@ -115,8 +132,8 @@ describe('TEST for todo', () => {
   });
   //recovery a todo
   it('8)Test recovery deleted todo(POST)', (done) => {
-    let serachId=1;
-    api.post('/todo/'+serachId)
+
+    api.post('/todo/'+test_id)
       .expect(200)
       .end((err, res) => {
         if (err) {
@@ -129,6 +146,7 @@ describe('TEST for todo', () => {
       });
   });
   it('9)Test recovery deleted todo(POST) with no index', (done) => {
+
     api.post('/todo/')
       .expect(404)
       .end((err, res) => {
@@ -142,6 +160,7 @@ describe('TEST for todo', () => {
   });  
   //display all todos  
   it('10)Test show all todo item(GET)', (done) => {
+
     api.get('/')
       .expect(200)
       .end((err, res) => {
