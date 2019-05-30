@@ -1,3 +1,4 @@
+var db  = require('../models');
 exports.preCheckContent = function(req, res,next){
 	if(req.body.createtodo==(null|| undefined || "")){
 		var error = new Error('Input is null');
@@ -9,7 +10,7 @@ exports.preCheckContent = function(req, res,next){
 	}		
 next(); 
 };
-exports.idNotANum = function(req, res){
+exports.idNotANum = function(req, res,next){
 	var req_id = req.params.id;
 	var num = /^[0-9] .?[0-9]*/;
 	if(req_id==0){
@@ -22,7 +23,7 @@ exports.idNotANum = function(req, res){
 	}
 	next(); 
 };
-exports.idIsUnique = function(req, res){
+exports.idIsUnique = function(req, res,next){
 	var todo_id = req.params.id;
 
 	let checkIdExist = function(id){ //use promise to get query result
