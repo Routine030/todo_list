@@ -123,4 +123,7 @@ exports.queryItem = function(req, res){
 			res.json(err.message);
 		});
 	}
+	else{
+		res.json('');
+	}
 }

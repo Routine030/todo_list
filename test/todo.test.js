@@ -6,6 +6,8 @@ const api = supertest(server);
 describe('TEST for todo', () => {
 
 let test_id;
+let test_content;
+let test_date;
 
 before('before start', (done)=>{
 
@@ -13,6 +15,8 @@ before('before start', (done)=>{
   db.todolists.create(testData)
   .then((result) => {
           test_id=result.id;
+          test_content=result.content;
+          test_date=result.createdAt.toISOString().substr(0,10) ;
           done();
       });
 })
@@ -180,5 +184,71 @@ before('before start', (done)=>{
           done();
         }
       });     
+  });
+  it('11)Test query todo item by date(GET)', (done) => {
+
+    api.get('/todo?date='+test_date)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          done(err);
+        }
+        else{
+          expect(res.body).to.be.instanceof(Array);
+          let entries=res.body[0];
+          for(var i=0;i<entries.length;i++){
+            expect(entries[i]).to.be.a('number');
+          }
+          done();
+        }
+      });    
+  });
+  it('12)Test query todo item by err type date(GET)', (done) => {
+
+    api.get('/todo?date='+'abc')
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          done(err);
+        }
+        else{
+          expect(res.body).to.be.instanceof(Array);
+          expect(res.body).eql([]);
+          done();
+        }
+      });    
+  });  
+  it('13)Test query todo item by text(GET)', (done) => {
+
+    api.get('/todo?text='+test_content)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          done(err);
+        }
+        else{
+          expect(res.body).to.be.instanceof(Array);
+          let entries=res.body[0];
+          for(var i=0;i<entries.length;i++){
+            expect(entries[i]).to.be.a('number');
+          }
+          done();
+        }
+      }); 
+  });
+  it('14)Test query todo item by null content(GET)', (done) => {
+
+    api.get('/todo?text=')
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          done(err);
+        }
+        else{
+          expect(res.body).to.be.a('string');
+          expect(res.body).eql('');
+          done();
+        }
+      });
   });
 });
