@@ -24,7 +24,7 @@ class InputBlock extends React.Component{
   submitTodo(){
       /* something should to-do:*/ 
       var self = this;
-      if(this.state.createtodo==''){
+      if(this.state.createtodo===''){
           alert('Please input data')
       }
       else{
@@ -110,14 +110,12 @@ class InputBlock extends React.Component{
 		alignItems="center">
 			<Grid item>
 				<div id="searchByText" style={distext}>
-			    <SearchBlock searchContent={this.props.searchContent}
-	             changeState={this.props.changeState}/>
+			    <SearchBlock changeState={this.props.changeState}/>
 				</div>
 			</Grid>
 			<Grid item>
 				<div id="searchByDate" style={disdate}>
-				<SearchDateBlock searchDate={this.props.searchDate}
-             changeDState={this.props.changeDState}/>
+				<SearchDateBlock changeDState={this.props.changeDState}/>
         		</div>
         	</Grid>
       </Grid>

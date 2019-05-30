@@ -1,5 +1,5 @@
 var db  = require('../models');
-
+const { Op } = require('sequelize');
 exports.createItem = function(req, res){
 	db.todolists.create({content: req.body.createtodo})
 	.then(function(result){
@@ -71,4 +71,56 @@ exports.updateItem = function(req, res){
 	}).catch(function(err){
 	    res.json(err.message);
 	});
+}
+exports.queryItem = function(req, res){
+	if(req.query.date){
+		var qdate = new Date(req.query.date);
+		db.todolists.findAll(
+			{
+				where: {
+		  				createdAt: {
+		    				[Op.lt]: new Date(qdate.getTime() + 24 * 60 * 60 * 1000),
+		    				[Op.gt]: qdate
+		 				 }
+				}, paranoid: false
+			}
+		).then(function(result){
+			var arr = [];
+	        for (var i = 0, output; output = result[i++];) {
+	        	let del_tag=0;
+				if(output.deletedAt){
+					del_tag=1;
+				}
+				arr.push(output.id);
+	        }
+		/* render page */
+		res.status(200).json(arr);
+		}).catch(function(err){
+			res.json(err.message);
+		});
+	}
+	else if(req.query.text){
+		var qtext = req.query.text;
+		console.log(qtext);
+		db.todolists.findAll(
+			{
+				where: {
+		  				content:{[Op.substring]: qtext}
+				}, paranoid: false
+			}
+		).then(function(result){
+			var arr = [];
+	        for (var i = 0, output; output = result[i++];) {
+	        	let del_tag=0;
+				if(output.deletedAt){
+					del_tag=1;
+				}
+			    arr.push(output.id);
+	        }
+		/* render page */
+		res.status(200).json(arr);
+		}).catch(function(err){
+			res.json(err.message);
+		});
+	}
 }
