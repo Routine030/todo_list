@@ -21,31 +21,32 @@ class InputBlock extends React.Component{
   changeState(event){
     this.setState({createtodo:event.target.value})
   }    
-  submitTodo(){
+async submitTodo(){
       /* something should to-do:*/ 
-      var self = this;
       if(this.state.createtodo===''){
           alert('Please input data')
       }
       else{
         var text=(this.state);
-             $.ajax({
-                method: "POST",
-                url: "http://localhost:3001/",
-                data: text,
-               })
-                .done(function( msg ) {
-                  self.props.addTodo(msg[0]);//set state
-                  self.setState({createtodo:''});//change display
+        let ret;
+        try{
+          ret = await $.ajax({
+                  method: "POST",
+                  url: "http://localhost:3001/",
+                  data: text,
                 })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                  if(jqXHR.responseText){
-                      alert(textStatus+': '+jqXHR.responseText);
-                  }
-                  else{
-                      alert(textStatus+': '+errorThrown);
-                  }
-                });
+        }
+        catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+        }
+        this.props.addTodo(ret[0]);//set state
+        this.setState({createtodo:''});//change display
       }
   }
   searchByText(){

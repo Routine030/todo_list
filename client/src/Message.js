@@ -18,55 +18,55 @@ class Message extends React.Component{
     this.clearMod= this.clearMod.bind(this)
     this.state = ({normalMode:1,oriMsg:this.props.content})
   }
-  submitDelTodo(){
+  async submitDelTodo(){
     /* something should to-do:
       set state and change display
       del backend DB
     */
     var tempUrl='http://localhost:3001/todo/'+this.props.id;    
     var delSendMsg;
-    if(this.props.deltag)//recovery
-    {
+    if(this.props.deltag){//recovery
      delSendMsg={deltag:0,id:this.props.id}
-     $.ajax({
-        type: "POST",
-        url: tempUrl,
-       })
-      .done(function( msg ) {
-             this.props.delTodo(delSendMsg);  
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
-        }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
-    }else //delete
-    {     
+     try{
+        await $.ajax({
+          type: "POST",
+          url: tempUrl,
+        })
+     }
+     catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+     }
+     this.props.delTodo(delSendMsg);  
+    }else{ //delete  
      delSendMsg={deltag:1,id:this.props.id};
-     $.ajax({
-        type: "DELETE",
-        url: tempUrl,
-       })
-      .done(function( msg ) {
-         this.props.delTodo(delSendMsg);
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
-        }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
+     try{
+        await $.ajax({
+          type: "DELETE",
+          url: tempUrl,
+        })
+     }
+     catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+     }
+     this.props.delTodo(delSendMsg);
     }
   }
   openEditTodo(){
     this.setState({normalMode:0});
   }
-  submitEditTodo(){
+  async submitEditTodo(){
     /* something should to-do:
       set state and change display
       del backend DB
@@ -74,30 +74,31 @@ class Message extends React.Component{
     var tempUrl='http://localhost:3001/todo/'+this.props.id; 
     var modSendMsg;
     var text=this.state;
-    console.log('text: '+text);
+
     if(this.state.oriMsg){
       this.setState({normalMode:1});
-     modSendMsg={id:this.props.id, content:this.state.oriMsg};
-   
-     $.ajax({
-        type: "PUT",
-        url: tempUrl,
-        data: text,
-       })
-      .done(function( msg ) {
-        console.log(msg);
-        this.props.modTodo(modSendMsg);  
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
-        }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
+      modSendMsg={id:this.props.id, content:this.state.oriMsg};
+      try{
+        await $.ajax({
+          type: "PUT",
+          url: tempUrl,
+          data: text,
+        })
+      }
+      catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+      }  
+      this.props.modTodo(modSendMsg);
     }
-    else{alert('Please input data');}
+    else{
+      alert('Please input data');
+    }
   }
   editMsg(e){
         this.setState({oriMsg:e.target.value});

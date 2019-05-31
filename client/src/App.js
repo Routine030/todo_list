@@ -26,61 +26,63 @@ class App extends React.Component{
     this.handleDelTodoItem= this.handleDelTodoItem.bind(this)
     this.handleModTodoItem= this.handleModTodoItem.bind(this)
   }
-  changeState(event){
-      var self = this;
+  async changeState(event){
       var searchValue=event.target.value;
-    var searchBar = this.state.searchData;
+      var searchBar = this.state.searchData;
+
       searchBar.content = searchValue;
       this.setState({searchData: searchBar})
       if(searchValue===''){
-        //console.log('del search');
-        self.handleSearchList('','text');
-        self.handleSearchTodoItem();              
+        this.handleSearchList('','text');
+        this.handleSearchTodoItem();              
       }
       else{
-             $.ajax({
-                method: "GET",
-                url: "http://localhost:3001/todo?text="+searchValue,
-               })
-                .done(function( msg ) {
-                  self.handleSearchList(msg,'text');
-                  self.handleSearchTodoItem();
+        let ret;
+        try{
+          ret = await $.ajax({
+                  method: "GET",
+                  url: "http://localhost:3001/todo?text="+searchValue,
                 })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                  if(jqXHR.responseText){
-                      alert(textStatus+': '+jqXHR.responseText);
-                  }
-                  else{
-                      alert(textStatus+': '+errorThrown);
-                  }
-      });    
-  }
+
+        }
+        catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+        }
+        this.handleSearchList(ret,'text');
+        this.handleSearchTodoItem();
+      }
   }  
-  changeDState(event){
-      var self = this;
+  async changeDState(event){
       var searchValue=event.target.value;
       if(searchValue===''){
-        //console.log('del date');
-        self.handleSearchList('','date');
-        self.handleSearchTodoItem();
+        this.handleSearchList('','date');
+        this.handleSearchTodoItem();
       }
       else{
-             $.ajax({
-                method: "GET",
-                url: "http://localhost:3001/todo?date="+searchValue,
-               })
-                .done(function( msg ) {
-                  self.handleSearchList(msg,'date');
-                  self.handleSearchTodoItem();
+        let ret;
+        try{
+          ret = await $.ajax({
+                  method: "GET",
+                  url: "http://localhost:3001/todo?date="+searchValue,
                 })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                  if(jqXHR.responseText){
-                      alert(textStatus+': '+jqXHR.responseText);
-                  }
-                  else{
-                      alert(textStatus+': '+errorThrown);
-                  }
-                });
+        }
+        catch(err){
+          if(err.responseText){
+            alert('error: '+err.responseText);
+          }
+          else{
+           alert('error: '+err.statusText);
+          }          
+          return;
+        }
+        this.handleSearchList(ret,'date');
+        this.handleSearchTodoItem();
       }
   }
   handleSearchList(arr,type){
@@ -127,19 +129,18 @@ class App extends React.Component{
         //else not find
       }
       //create new display list
-      for(var i=0;i<old_todo.length;i++){
-        for(var j=0;j<dislist.length;j++){
-          if(old_todo[i].id===dislist[j]){
+      old_todo.forEach((x)=>{
+        dislist.forEach((y)=>{
+          if(x.id===y){
             arr.push({
-              id: old_todo[i].id,
-              createdAt: old_todo[i].createdAt,
-              content: old_todo[i].content,
-              deltag: old_todo[i].deltag
-      });
-            break;
+              id: x.id,
+              createdAt: x.createdAt,
+              content: x.content,
+              deltag: x.deltag              
+            });
           }
-        }
-      }
+        })
+      });
       this.setState({list: arr});
   }
   handleAddTodoItem(todoText) {
@@ -157,7 +158,6 @@ class App extends React.Component{
       var index = todos.findIndex(obj => obj.id === todoText.id);
       todos[index].deltag = todoText.deltag;
       this.setState({list: todos}, () => {
-        //console.log(todos); 
       });
   }  
   handleModTodoItem(todoText) {
@@ -165,30 +165,26 @@ class App extends React.Component{
       var index = todos.findIndex(obj => obj.id === todoText.id);
       todos[index].content = todoText.content;
       this.setState({list: todos}, () => {
-        console.log(todos); 
       });
   }            
   render(){
     return(
-      <Grid
-  container
-  direction="column"
-  justify="flex-start"
-  alignItems="stretch"
->
-<MuiThemeProvider theme={theme}>    
-
-     <MainTitle />
-      <InputBlock addTodo={this.handleAddTodoItem}      
-        changeDState={this.changeDState}
-        changeState={this.changeState}/>  
-      <hr/>
-      <MessageBlock dbData={this.state.list} 
-                    delTodo={this.handleDelTodoItem}
-                    modTodo={this.handleModTodoItem} />
-      <BottomAppBar />
-             
-</MuiThemeProvider>
+      <Grid container
+        direction="column"
+        justify="flex-start"
+        alignItems="stretch"
+      >
+        <MuiThemeProvider theme={theme}>  
+          <MainTitle />
+          <InputBlock addTodo={this.handleAddTodoItem}      
+            changeDState={this.changeDState}
+            changeState={this.changeState}/>  
+          <hr/>
+          <MessageBlock dbData={this.state.list} 
+                        delTodo={this.handleDelTodoItem}
+                        modTodo={this.handleModTodoItem} />
+          <BottomAppBar />               
+        </MuiThemeProvider>
       </Grid>
     )
   }
