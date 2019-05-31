@@ -29,29 +29,21 @@ exports.idNotANum = function (req, res, next) {
 exports.idIsUnique = function (req, res, next) {
   const todoId = req.params.id;
 
-  const checkIdExist = function (id) { // use promise to get query result
-    return db.todolists.findByPk(id, { paranoid: false })
-    // paranoid: false=>the data has deletedAt will be search
-      .then((ret) => {
-        if (!ret) {
-          return 0;
-        }
-        return ret.dataValues;
-      })
-      .catch((err) => {
-        next(err);
-      });
-  };
-  checkIdExist(todoId)
-    .then((ret) => {
-      if (ret === 0) {
-        const error = new RangeError('Index error');
-        next(error);
-      } else {
-        next();
-      }
-    })
-    .catch((err) => {
+  const checkIdExist = async function (id) {
+    let ret;
+    try {
+      ret = await db.todolists.findByPk(id, { paranoid: false });
+      console.log(`ret:${ret}`);
+    } catch (err) {
       next(err);
-    });
+    }
+    if (!ret) {
+      const error = new RangeError('Index error');
+      next(error);
+    } else {
+      next();
+    }
+  };
+
+  checkIdExist(todoId);
 };
