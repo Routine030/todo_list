@@ -47,7 +47,7 @@ class App extends React.Component {
     const searchValue = event.target.value;
     const { searchData } = this.state;
     const searchBar = searchData;
-
+    const tempUrl = `http://localhost:3001/todo?text=${searchValue}`;
     searchBar.content = searchValue;
     this.setState({ searchData: searchBar });
 
@@ -59,7 +59,7 @@ class App extends React.Component {
       try {
         ret = await $.ajax({
           method: 'GET',
-          url: `http://localhost:3001/todo?text=${searchValue}`,
+          url: tempUrl,
         });
       } catch (err) {
         if (err.responseText) {
@@ -100,6 +100,8 @@ class App extends React.Component {
   }
 
   handleSearchList(arr, type) {
+    /* check search is by date or content,
+       and add into the corresponding state */
     const { searchData } = this.state;
     const searchBar = searchData;
     if (type === 'date') {
@@ -113,6 +115,7 @@ class App extends React.Component {
   }
 
   async handleSearchTodoItem() {
+    /* display search result */
     let oldTodo;
     try {
       oldTodo = await initWebDB();

@@ -16,7 +16,7 @@ class InputBlock extends React.Component {
     super(props);
     this.state = ({ createtodo: '', displaysearchtext: 0, displaysearchdate: 0 });
     this.changeState = this.changeState.bind(this);
-    this.submitTodo = this.submitTodo.bind(this);
+    this.createTodo = this.createTodo.bind(this);
     this.searchByText = this.searchByText.bind(this);
     this.searchByDate = this.searchByDate.bind(this);
   }
@@ -25,9 +25,11 @@ class InputBlock extends React.Component {
     this.setState({ createtodo: event.target.value });
   }
 
-  async submitTodo() {
+  async createTodo() {
     const { createtodo } = this.state;
     const { addTodo } = this.props;
+    const tempUrl = 'http://localhost:3001/';
+
     if (createtodo === '') {
       alert('Please input data');
     } else {
@@ -36,7 +38,7 @@ class InputBlock extends React.Component {
       try {
         ret = await $.ajax({
           method: 'POST',
-          url: 'http://localhost:3001/',
+          url: tempUrl,
           data: text,
         });
       } catch (err) {
@@ -105,7 +107,7 @@ class InputBlock extends React.Component {
             />
           </Grid>
           <Grid item>
-            <IconButton type="button" onClick={this.submitTodo} color="primary"><AddIcon fontSize="large" /></IconButton>
+            <IconButton type="button" onClick={this.createTodo} color="primary"><AddIcon fontSize="large" /></IconButton>
             <IconButton type="button" onClick={this.searchByText} color="primary"><SearchIcon fontSize="large">Search</SearchIcon></IconButton>
             <IconButton type="button" onClick={this.searchByDate} color="primary"><DateIcon fontSize="large">Date</DateIcon></IconButton>
           </Grid>
