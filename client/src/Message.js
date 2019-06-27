@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react';
 import $ from 'jquery';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -7,152 +7,183 @@ import EditIcon from '@material-ui/icons/Edit';
 import CancelIcon from '@material-ui/icons/Cancel';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
+const _propType = require('prop-types');
 
-class Message extends React.Component{
+class Message extends React.Component {
   constructor(props) {
-    super(props)
-    this.submitDelTodo = this.submitDelTodo.bind(this)
-    this.openEditTodo = this.openEditTodo.bind(this)
-    this.submitEditTodo = this.submitEditTodo.bind(this)
-    this.editMsg = this.editMsg.bind(this)
-    this.clearMod= this.clearMod.bind(this)
-    this.state = ({normalMode:1,oriMsg:this.props.content})
+    super(props);
+    const { content } = this.props;
+    this.submitDelTodo = this.submitDelTodo.bind(this);
+    this.openEditTodo = this.openEditTodo.bind(this);
+    this.submitEditTodo = this.submitEditTodo.bind(this);
+    this.editMsg = this.editMsg.bind(this);
+    this.clearMod = this.clearMod.bind(this);
+    this.state = ({ normalMode: 1, oriMsg: content });
   }
-  submitDelTodo(){
+
+  async submitDelTodo() {
     /* something should to-do:
       set state and change display
       del backend DB
     */
-    var tempUrl='http://localhost:3001/todo/'+this.props.id;    
-    var delSendMsg;
-    if(this.props.deltag)//recovery
-    {
-     delSendMsg={deltag:0,id:this.props.id}
-     $.ajax({
-        type: "POST",
-        url: tempUrl,
-       })
-      .done(function( msg ) {
-             this.props.delTodo(delSendMsg);  
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
+    const { id, deltag, delTodo } = this.props;
+    const tempUrl = `http://localhost:3001/todo/${id}`;
+    let delSendMsg;
+    if (deltag) { // recovery
+      delSendMsg = { deltag: 0, id };
+      try {
+        await $.ajax({
+          type: 'POST',
+          url: tempUrl,
+        });
+      } catch (err) {
+        if (err.responseText) {
+          alert(`error: ${err.responseText}`);
+        } else {
+          alert(`error: ${err.statusText}`);
         }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
-    }else //delete
-    {     
-     delSendMsg={deltag:1,id:this.props.id};
-     $.ajax({
-        type: "DELETE",
-        url: tempUrl,
-       })
-      .done(function( msg ) {
-         this.props.delTodo(delSendMsg);
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
-        }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
-    }
-  }
-  openEditTodo(){
-    this.setState({normalMode:0});
-  }
-  submitEditTodo(){
-    /* something should to-do:
-      set state and change display
-      del backend DB
-    */
-    var tempUrl='http://localhost:3001/todo/'+this.props.id; 
-    var modSendMsg;
-    var text=this.state;
-    console.log('text: '+text);
-    if(this.state.oriMsg){
-      this.setState({normalMode:1});
-     modSendMsg={id:this.props.id, content:this.state.oriMsg};
-   
-     $.ajax({
-        type: "PUT",
-        url: tempUrl,
-        data: text,
-       })
-      .done(function( msg ) {
-        console.log(msg);
-        this.props.modTodo(modSendMsg);  
-       }.bind(this))
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if(jqXHR.responseText){
-            alert(textStatus+': '+jqXHR.responseText);
-        }
-        else{
-            alert(textStatus+': '+errorThrown);
-        }
-       });
-    }
-    else{alert('Please input data');}
-  }
-  editMsg(e){
-        this.setState({oriMsg:e.target.value});
-  }
-  clearMod() {
-        window.location.reload();
+        return;
       }
-  render(){
-   
-    let msgStyle={}
-    let editText={};
-    let editButton={};
-    let displayDate=(this.props.createdAt).substr(0,10) ;
+      delTodo(delSendMsg);
+    } else { // delete
+      delSendMsg = { deltag: 1, id };
+      try {
+        await $.ajax({
+          type: 'DELETE',
+          url: tempUrl,
+        });
+      } catch (err) {
+        if (err.responseText) {
+          alert(`error: ${err.responseText}`);
+        } else {
+          alert(`error: ${err.statusText}`);
+        }
+        return;
+      }
+      delTodo(delSendMsg);
+    }
+  }
 
-    if(this.props.deltag)
-    {
-      msgStyle={textDecorationLine:'line-through'}
-      editButton={display:'none'}  
+  openEditTodo() {
+    this.setState({ normalMode: 0 });
+  }
+
+  async submitEditTodo() {
+    /* something should to-do:
+      set state and change display
+      del backend DB
+    */
+    const { id, modTodo } = this.props;
+
+    const tempUrl = `http://localhost:3001/todo/${id}`;
+    let modSendMsg;
+    const { oriMsg } = this.state;
+    const text = this.state;
+    if (oriMsg) {
+      this.setState({ normalMode: 1 });
+      modSendMsg = { id, content: oriMsg };
+      try {
+        await $.ajax({
+          type: 'PUT',
+          url: tempUrl,
+          data: text,
+        });
+      } catch (err) {
+        if (err.responseText) {
+          alert(`error: ${err.responseText}`);
+        } else {
+          alert(`error: ${err.statusText}`);
+        }
+        return;
+      }
+      modTodo(modSendMsg);
+    } else {
+      alert('Please input data');
     }
-    if(this.state.normalMode){
-      editText={display:'none'}
+  }
+
+  editMsg(e) {
+    this.setState({ oriMsg: e.target.value });
+  }
+
+  clearMod() {
+    window.location.reload();
+  }
+
+  render() {
+    const { createdAt, deltag, content } = this.props;
+    const { normalMode, oriMsg } = this.state;
+    let msgStyle = {};
+    let editText = {};
+    let editButton = {};
+    const displayDate = (createdAt).substr(0, 10);
+
+    if (deltag) {
+      msgStyle = { textDecorationLine: 'line-through' };
+      editButton = { display: 'none' };
     }
-    else{
-      editText={display:''}
-      msgStyle={display:'none'}
-      editButton={display:'none'}
+    if (normalMode) {
+      editText = { display: 'none' };
+    } else {
+      editText = { display: '' };
+      msgStyle = { display: 'none' };
+      editButton = { display: 'none' };
     }
-    return(
+    return (
       <div>
-          {/* display mode */}
-          <span id="disTodo"style={msgStyle}>
-            <Checkbox
-              checked={this.props.deltag}
-              onChange={this.submitDelTodo}
-              color="primary" 
-            />                  
-            {this.props.content}
-          </span>
-          <IconButton onClick={this.openEditTodo} style={editButton} color="primary"><EditIcon></EditIcon></IconButton>
-
-          {/* edit mode */} 
-          <span id="editTodo" style={editText}>
-            <Checkbox
-            checked={this.props.deltag}
+        {/* display mode */}
+        <span id="disTodo" style={msgStyle}>
+          <Checkbox
+            checked={deltag}
             onChange={this.submitDelTodo}
-            color="primary" disabled
-            />           
-            <TextField type="text" value={this.state.oriMsg} onChange={this.editMsg}/>
-            <IconButton onClick={this.submitEditTodo} color="secondary"><AddCircleIcon></AddCircleIcon></IconButton>
-            <IconButton onClick={this.clearMod} color="secondary"><CancelIcon></CancelIcon></IconButton>
-          </span> 
-          <div style={{paddingLeft:'5%',}}>{displayDate}post.</div>     
-      </div>    
-    )
+            color="primary"
+          />
+          {content}
+        </span>
+        <IconButton onClick={this.openEditTodo} style={editButton} color="primary"><EditIcon /></IconButton>
+
+        {/* edit mode */}
+        <span id="editTodo" style={editText}>
+          <Checkbox
+            checked={deltag}
+            onChange={this.submitDelTodo}
+            color="primary"
+            disabled
+          />
+          <TextField type="text" value={oriMsg} onChange={this.editMsg} />
+          <IconButton onClick={this.submitEditTodo} color="secondary"><AddCircleIcon /></IconButton>
+          <IconButton onClick={this.clearMod} color="secondary"><CancelIcon /></IconButton>
+        </span>
+        <div style={{ paddingLeft: '5%' }}>
+          {displayDate}
+post.
+        </div>
+      </div>
+    );
   }
 }
 
-export { Message }
+Message.propTypes = {
+  content: _propType.string,
+  id: _propType.number,
+  deltag: _propType.number,
+  delTodo: _propType.node,
+  modTodo: _propType.node,
+  createdAt: _propType.string,
+};
+
+Message.defaultProps = {
+  content: 'test',
+  id: '1',
+  deltag: 0,
+  createdAt: '0',
+  delTodo: {
+    id: '1',
+    deltag: 0,
+  },
+  modTodo: {
+    id: '1',
+    content: 'test',
+  },
+};
+export default Message;

@@ -1,4 +1,4 @@
-# todolist
+﻿# todolist
 ## 實作環境
 OS: Windows10 家用版  
 ### backend:
@@ -62,7 +62,7 @@ jQuery發送Ajax Request,等待後端回傳sucess後再改變頁面
 * 日期搜尋和全文搜尋=>
 使用state判斷後直接修改頁面顯示
 ## Project 啟動方式
-1. 分別在todo_list及todo_list/client中安裝module(npm update)
+1. 分別在todo_list及todo_list/client中安裝module(npm install)  
 2. 設定DB Server
 * 假設已存在Database server(Mysql 5.7),先自行建立好一個新的DB schema,並設定  
 =>charset: utf8mb4,collate: utf8mb4_unicode_ci,以確保中文支援,

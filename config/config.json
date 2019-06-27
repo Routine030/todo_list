@@ -1,0 +1,15 @@
+{
+  "development": {
+    "username": "routine",
+    "password": "test1234",
+    "database": "todo_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "define": {
+        "charset": "utf8mb4",
+        "dialectOptions": {
+        "collate": "utf8mb4_unicode_ci"
+        }
+    }
+  }
+}

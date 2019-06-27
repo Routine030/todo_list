@@ -1,22 +1,23 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 
-class SearchBlock extends React.Component {
+const _propType = require('prop-types');
 
-  render() {
-    return (
-      <div>
-        <TextField
-          id="input-search"
-          label="Search field"
-          type="search"
-          margin="normal"
-          value={this.props.searchContent}
-	      onChange={this.props.changeState}
-        />
-      </div>
-    );
-  }
-}
-
-export { SearchBlock }
+export const SearchBlock = ({ changeState }) => (
+  <div>
+    <TextField
+      id="input-search"
+      label="Search field"
+      type="search"
+      margin="normal"
+      onChange={changeState}
+    />
+  </div>
+);
+SearchBlock.propTypes = {
+  changeState: _propType.string,
+};
+SearchBlock.defaultProps = {
+  changeState: '',
+};
+export default SearchBlock;
